@@ -1,0 +1,14 @@
+name: corekit
+description: "An opinionated core for a basic project based on riverpod"
+version: 0.0.1
+publish_to: none
+
+environment:
+  sdk: ">=3.8.0 <4.0.0"
+
+dependencies:
+  flutter:
+    sdk: flutter
+
+dev_dependencies:
+  very_good_analysis: ^7.0.0
