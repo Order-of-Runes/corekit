@@ -7,7 +7,11 @@
 .buildlog/
 .history
 
-
+# IntelliJ related
+*.iml
+*.ipr
+*.iws
+.idea/
 
 # Flutter repo-specific
 /bin/cache/
@@ -27,6 +31,7 @@
 /packages/flutter/coverage/
 version
 analysis_benchmark.json
+.metadata
 
 # packages file containing multi-root paths
 .packages.generated
