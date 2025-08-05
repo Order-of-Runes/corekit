@@ -7,8 +7,29 @@ environment:
   sdk: ">=3.8.0 <4.0.0"
 
 dependencies:
+  dio: ^5.8.0+1
+  equatable: ^2.0.7
   flutter:
     sdk: flutter
+  foundation:
+    git:
+      url: https://github.com/Order-of-Runes/foundation.git
+      ref: main
+  rusty_dart:
+    git:
+      url: https://github.com/TheMakersPrime/rusty_dart.git
+      ref: main
+  sembast: ^3.8.1+1
+  sembast_sqflite: ^2.2.0+4
+  sherlog:
+    git:
+      url: https://github.com/TheMakersPrime/sherlog.git
+      ref: main
+  sqflite: ^2.4.1
+  utils:
+    git:
+      url: https://github.com/Order-of-Runes/utils.git
+      ref: main
 
 dev_dependencies:
   very_good_analysis: ^7.0.0
