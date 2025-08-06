@@ -7,14 +7,21 @@ environment:
   sdk: ">=3.8.0 <4.0.0"
 
 dependencies:
+  animations: ^2.0.11
+  basic_components:
+    git:
+      url: https://github.com/Order-of-Runes/basic_components.git
+      ref: main
   dio: ^5.8.0+1
   equatable: ^2.0.7
   flutter:
     sdk: flutter
+  flutter_riverpod: ^2.6.1
   foundation:
     git:
       url: https://github.com/Order-of-Runes/foundation.git
       ref: main
+  go_router: ^16.1.0
   rusty_dart:
     git:
       url: https://github.com/TheMakersPrime/rusty_dart.git
