@@ -9,8 +9,8 @@ import 'package:foundation/foundation.dart';
 import 'package:rusty_dart/rusty_dart.dart';
 import 'package:utils/utils.dart';
 
-abstract class BaseViewModel<S extends BaseState> extends ViewModelFoundation<S> {
-  BaseViewModel({this.enableLog = false}) : logcat = Logcat();
+abstract class CoreViewModel<S extends BaseState> extends ViewModelFoundation<S> {
+  CoreViewModel({this.enableLog = false}) : logcat = Logcat();
 
   final Logcat logcat;
   final bool enableLog;
