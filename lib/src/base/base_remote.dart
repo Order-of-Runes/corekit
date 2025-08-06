@@ -1,7 +1,7 @@
 // Copyright (c) 2024 EShare Authors. All rights reserved.
 
 import 'package:corekit/src/api/api_service_core.dart';
-import 'package:corekit/src/injector/core_injector.dart';
+import 'package:corekit/src/injector/injector_core.dart';
 import 'package:flutter/foundation.dart';
 
 /// Base class for all remote data sources

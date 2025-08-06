@@ -1,7 +1,7 @@
 // Copyright (c) 2024 EShare Authors. All rights reserved.
 
 import 'package:corekit/src/base/base_model.dart';
-import 'package:corekit/src/injector/core_injector.dart';
+import 'package:corekit/src/injector/injector_core.dart';
 import 'package:corekit/src/store/store.dart';
 
 /// Base class for all cached data sources

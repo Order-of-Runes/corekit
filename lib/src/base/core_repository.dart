@@ -6,7 +6,7 @@ import 'package:corekit/src/base/base_model.dart';
 import 'package:corekit/src/base/base_remote.dart';
 import 'package:corekit/src/base/core_list_model.dart';
 import 'package:corekit/src/base/pagination_controller.dart';
-import 'package:corekit/src/injector/core_injector.dart';
+import 'package:corekit/src/injector/injector_core.dart';
 import 'package:flutter/foundation.dart';
 import 'package:foundation/foundation.dart';
 import 'package:rusty_dart/rusty_dart.dart';
