@@ -2,6 +2,7 @@
 
 import 'package:corekit/src/api/api_service_core.dart';
 import 'package:corekit/src/base/base_network_util.dart';
+import 'package:corekit/src/router/router.dart';
 import 'package:corekit/src/store/store.dart';
 
 abstract class InjectorCore {
@@ -14,4 +15,6 @@ abstract class InjectorCore {
   ApiServiceCore get apiService;
 
   BaseNetworkUtil get network;
+
+  RouterCore get router;
 }
