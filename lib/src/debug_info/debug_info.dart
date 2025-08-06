@@ -1,9 +1,7 @@
 // Copyright (c) 2025 EShare Authors. All rights reserved.
 
 import 'package:basic_components/basic_components.dart';
-import 'package:corekit/src/debug_info/network_log_page.dart';
-import 'package:corekit/src/injector/injector_core.dart';
-import 'package:corekit/src/widgets/route_listener.dart';
+import 'package:corekit/corekit.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
@@ -22,7 +20,8 @@ class DebugInfo extends StatefulWidget {
     required this.bannerColor,
     required this.flavor,
     required this.bannerLabel,
-    required this.injector,
+    required this.logger,
+    required this.router,
     required this.baseUrlResolver,
     this.shouldShow = false,
     this.isToggleable = false,
@@ -39,7 +38,8 @@ class DebugInfo extends StatefulWidget {
   final bool isToggleable;
   final bool isDevFlavor;
   final bool showAddressBar;
-  final InjectorCore injector;
+  final DioMemoryLogger logger;
+  final RouterCore router;
   final String Function(String) baseUrlResolver;
 
   @override
@@ -69,7 +69,7 @@ class _DebugInfoState extends State<DebugInfo> {
           Navigator.push(
             context,
             MaterialPageRoute(
-              builder: (_) => NetworkLogPage(logger: widget.injector.dioMemoryLogger),
+              builder: (_) => NetworkLogPage(logger: widget.logger),
             ),
           );
         },
@@ -172,7 +172,7 @@ class _DebugInfoState extends State<DebugInfo> {
                         ],
                       );
                     },
-                    router: widget.injector.router,
+                    router: widget.router,
                   ),
                 )
               : const SizedBox.shrink(),
