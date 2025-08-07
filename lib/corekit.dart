@@ -5,7 +5,6 @@ export 'src/api/interceptors/dio_console_logger.dart';
 export 'src/api/interceptors/dio_memory_logger.dart';
 export 'src/base/base_dao.dart';
 export 'src/base/base_model.dart';
-export 'src/base/base_network_util.dart';
 export 'src/base/base_remote.dart';
 export 'src/base/base_repository.dart';
 export 'src/base/base_state.dart';
