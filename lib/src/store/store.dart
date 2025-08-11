@@ -19,16 +19,9 @@ abstract class CoreDatabase {
   CoreDatabase(
     String name, {
     this.enableLog = false,
-  }) : _dbName = '$name.store',
-       _eternal = false;
-
-  /// For when data stored in the db should persist beyond
-  /// a user's session
-  CoreDatabase.eternal(
-    String name, {
-    this.enableLog = false,
-  }) : _dbName = '${name}_eternal.store',
-       _eternal = true;
+    bool eternal = false,
+  }) : _eternal = eternal,
+       _dbName = eternal ? '${name}_eternal.store' : '$name.store';
 
   late Database _db;
   late DatabaseFactory _dbFactory;
