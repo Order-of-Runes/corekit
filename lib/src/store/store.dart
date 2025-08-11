@@ -4,6 +4,7 @@
 
 import 'package:corekit/src/base/base_model.dart';
 import 'package:corekit/src/store/model_transformation.dart';
+import 'package:flutter/foundation.dart';
 import 'package:foundation/foundation.dart';
 import 'package:path/path.dart';
 import 'package:rusty_dart/rusty_dart.dart';
@@ -29,6 +30,9 @@ abstract class CoreDatabase {
   final bool _eternal;
   final String _dbName;
   final bool enableLog;
+
+  @protected
+  Database get database => _db;
 
   /// Initialize the database
   ///
@@ -93,15 +97,16 @@ abstract class CoreDatabase {
 
 abstract class CoreStore<T extends BaseModel> with ModelTransformation {
   CoreStore(
-    this._db, {
+    Database db, {
     String? suffix,
   }) {
+    _db = db;
     final baseName = resolveStoreName;
     final storeName = suffix.isNullOrEmpty ? baseName : '$baseName-$suffix';
     _ref = stringMapStoreFactory.store(storeName);
   }
 
-  final Database _db;
+  late final Database _db;
   late final StoreRef<String, Map<String, Object?>> _ref;
 
   /// Insert/update a model with value from field marked as [@primaryKey] as key.
