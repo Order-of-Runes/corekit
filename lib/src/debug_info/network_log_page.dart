@@ -6,7 +6,6 @@ import 'package:basic_components/basic_components.dart';
 import 'package:corekit/src/api/helper/network_log.dart';
 import 'package:corekit/src/api/interceptors/dio_memory_logger.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:utils/utils.dart';
 
 const double _small = 16;
@@ -31,58 +30,55 @@ class NetworkLogPage extends StatelessWidget {
     final textTheme = theme.textTheme;
 
     final color = theme.colorScheme;
-    return Consumer(
-      builder: (context, ref, _) {
-        final responses = logger.responses.reversed.toList(growable: false);
-        return ListView.separated(
-          itemBuilder: (context, index) {
-            final response = responses[index];
-            final request = logger.getRequest(response.uri?.toString() ?? '');
-            return InkWell(
-              onTap: () {
-                if (response.isNotNull) {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (context) {
-                        return _NetworkLogDetail(
-                          request: request,
-                          response: response,
-                        );
-                      },
-                    ),
-                  );
-                }
-              },
-              child: Padding(
-                padding: const EdgeInsets.all(_small),
-                child: Row(
-                  children: [
-                    DecoratedBox(
-                      decoration: BoxDecoration(
-                        borderRadius: BorderRadius.circular(_smallXXX),
-                        border: Border.all(color: color.onSurface),
-                      ),
-                      child: Padding(
-                        padding: const EdgeInsets.symmetric(horizontal: _smallXXX),
-                        child: Text(response.method, style: textTheme.labelMedium),
-                      ),
-                    ),
-                    const HorizontalGap(_medium),
-                    Expanded(child: Text(response.uri?.toString() ?? '', style: textTheme.bodyMedium)),
-                    const HorizontalGap(_medium),
-                    _Status(code: response.statusCode ?? 0),
-                  ],
+    final responses = logger.responses.reversed.toList(growable: false);
+
+    return ListView.separated(
+      itemBuilder: (context, index) {
+        final response = responses[index];
+        final request = logger.getRequest(response.uri?.toString() ?? '');
+        return InkWell(
+          onTap: () {
+            if (response.isNotNull) {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) {
+                    return _NetworkLogDetail(
+                      request: request,
+                      response: response,
+                    );
+                  },
                 ),
-              ),
-            );
+              );
+            }
           },
-          separatorBuilder: (context, index) {
-            return const Divider(height: 0);
-          },
-          itemCount: responses.length,
+          child: Padding(
+            padding: const EdgeInsets.all(_small),
+            child: Row(
+              children: [
+                DecoratedBox(
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(_smallXXX),
+                    border: Border.all(color: color.onSurface),
+                  ),
+                  child: Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: _smallXXX),
+                    child: Text(response.method, style: textTheme.labelMedium),
+                  ),
+                ),
+                const HorizontalGap(_medium),
+                Expanded(child: Text(response.uri?.toString() ?? '', style: textTheme.bodyMedium)),
+                const HorizontalGap(_medium),
+                _Status(code: response.statusCode ?? 0),
+              ],
+            ),
+          ),
         );
       },
+      separatorBuilder: (context, index) {
+        return const Divider(height: 0);
+      },
+      itemCount: responses.length,
     );
   }
 }
