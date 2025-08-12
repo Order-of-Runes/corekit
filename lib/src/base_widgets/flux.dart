@@ -7,7 +7,6 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:foundation/foundation.dart';
 
 typedef OnFluxDialog<S extends StateFoundation> = void Function(S, bool);
-typedef OnFluxError<S extends StateFoundation> = void Function(S);
 
 /// Wrap your page with Flux to handle your side effects
 class FluxCore<VM extends ViewModelFoundation<S>, S extends StateFoundation> extends StatelessWidget {
@@ -23,7 +22,7 @@ class FluxCore<VM extends ViewModelFoundation<S>, S extends StateFoundation> ext
   final AutoDisposeNotifierProvider<VM, S> provider;
   final WidgetBuilder builder;
   final OnFluxDialog<S> onDialog;
-  final OnFluxError<S> onError;
+  final void Function(ViewModelFoundation<S>, S) onError;
   final WidgetRef ref;
 
   @override
@@ -31,7 +30,7 @@ class FluxCore<VM extends ViewModelFoundation<S>, S extends StateFoundation> ext
     ref.listen(provider, (o, n) {
       _onListen(
         onDialog: onDialog,
-        onError: onError,
+        onError: (s) => onError(ref.read(provider.notifier), s),
         oldState: o,
         newState: n,
       );
@@ -54,7 +53,7 @@ class StickyFluxCore<VM extends StickyViewModelFoundation<S>, S extends StateFou
   final NotifierProvider<VM, S> provider;
   final WidgetBuilder builder;
   final OnFluxDialog<S> onDialog;
-  final OnFluxError<S> onError;
+  final void Function(StickyViewModelFoundation<S>, S) onError;
   final WidgetRef ref;
 
   @override
@@ -62,7 +61,7 @@ class StickyFluxCore<VM extends StickyViewModelFoundation<S>, S extends StateFou
     ref.listen(provider, (o, n) {
       _onListen(
         onDialog: onDialog,
-        onError: onError,
+        onError: (s) => onError(ref.read(provider.notifier), s),
         oldState: o,
         newState: n,
       );
@@ -74,7 +73,7 @@ class StickyFluxCore<VM extends StickyViewModelFoundation<S>, S extends StateFou
 
 void _onListen<S extends StateFoundation>({
   required OnFluxDialog<S> onDialog,
-  required OnFluxError<S> onError,
+  required void Function(S) onError,
   required S? oldState,
   required S newState,
 }) {
