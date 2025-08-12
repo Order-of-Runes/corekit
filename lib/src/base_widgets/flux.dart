@@ -17,28 +17,27 @@ class FluxCore<VM extends ViewModelFoundation<S>, S extends StateFoundation> ext
     required this.builder,
     required this.onDialog,
     required this.onError,
+    required this.ref,
   });
 
   final AutoDisposeNotifierProvider<VM, S> provider;
   final WidgetBuilder builder;
   final OnFluxDialog<S> onDialog;
   final OnFluxError<S> onError;
+  final WidgetRef ref;
 
   @override
   Widget build(BuildContext context) {
-    return Consumer(
-      builder: (context, ref, _) {
-        ref.listen(provider, (o, n) {
-          _onListen(
-            onDialog: onDialog,
-            onError: onError,
-            oldState: o,
-            newState: n,
-          );
-        });
-        return builder(context);
-      },
-    );
+    ref.listen(provider, (o, n) {
+      _onListen(
+        onDialog: onDialog,
+        onError: onError,
+        oldState: o,
+        newState: n,
+      );
+    });
+
+    return builder(context);
   }
 }
 
@@ -49,28 +48,27 @@ class StickyFluxCore<VM extends StickyViewModelFoundation<S>, S extends StateFou
     required this.builder,
     required this.onDialog,
     required this.onError,
+    required this.ref,
   });
 
   final NotifierProvider<VM, S> provider;
   final WidgetBuilder builder;
   final OnFluxDialog<S> onDialog;
   final OnFluxError<S> onError;
+  final WidgetRef ref;
 
   @override
   Widget build(BuildContext context) {
-    return Consumer(
-      builder: (context, ref, _) {
-        ref.listen(provider, (o, n) {
-          _onListen(
-            onDialog: onDialog,
-            onError: onError,
-            oldState: o,
-            newState: n,
-          );
-        });
-        return builder(context);
-      },
-    );
+    ref.listen(provider, (o, n) {
+      _onListen(
+        onDialog: onDialog,
+        onError: onError,
+        oldState: o,
+        newState: n,
+      );
+    });
+
+    return builder(context);
   }
 }
 
