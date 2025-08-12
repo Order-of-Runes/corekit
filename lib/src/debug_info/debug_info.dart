@@ -20,9 +20,9 @@ class DebugInfo extends StatefulWidget {
     required this.bannerColor,
     required this.flavor,
     required this.bannerLabel,
-    required this.logger,
     required this.router,
     required this.baseUrlResolver,
+    required this.networkLogPageBuilder,
     this.shouldShow = false,
     this.isToggleable = false,
     this.isDevFlavor = false,
@@ -38,9 +38,9 @@ class DebugInfo extends StatefulWidget {
   final bool isToggleable;
   final bool isDevFlavor;
   final bool showAddressBar;
-  final DioMemoryLogger logger;
   final RouterCore router;
   final String Function(String) baseUrlResolver;
+  final WidgetBuilder networkLogPageBuilder;
 
   @override
   State<DebugInfo> createState() => _DebugInfoState();
@@ -69,7 +69,7 @@ class _DebugInfoState extends State<DebugInfo> {
           Navigator.push(
             context,
             MaterialPageRoute(
-              builder: (_) => NetworkLogPage(logger: widget.logger),
+              builder: widget.networkLogPageBuilder,
             ),
           );
         },
