@@ -1,6 +1,6 @@
 name: corekit
 description: "An opinionated core for a basic project based on riverpod"
-version: 0.0.12
+version: 0.0.13
 publish_to: none
 
 environment:
@@ -14,7 +14,7 @@ dependencies:
       ref: main
   better_components:
     git:
-      url: https://github.com/Order-of-Runes/basic_components.git
+      url: https://github.com/Order-of-Runes/better_components.git
       ref: main
   dio: ^5.9.0
   equatable: ^2.0.7
