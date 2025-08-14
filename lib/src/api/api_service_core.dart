@@ -58,6 +58,7 @@ abstract class ApiServiceCore {
     required RestMethod method,
     required ApiUrlFoundation url,
     required Options options,
+    String contentType = Headers.jsonContentType,
     dynamic data,
     Map<String, dynamic>? queryParameters,
     Map<String, String>? pathParams,
@@ -70,21 +71,16 @@ abstract class ApiServiceCore {
 
     final path = _updatePath(url, pathParams, prefix);
     try {
-      final Options _options;
-      if (isTest) {
-        final scenario = isTest ? _testScenarios[url] : null;
-        _testScenarios.remove(url);
-        _options = scenario.isNullOrEmpty
-            ? options
-            : options.copyWith(
-                headers: {
-                  if (options.headers.isNotNullAndNotEmpty) ...options.headers!,
-                  's': scenario,
-                },
-              );
-      } else {
-        _options = options;
-      }
+      final scenario = isTest ? _testScenarios[url] : null;
+      _testScenarios.remove(url);
+      final _options = options.copyWith(
+        headers: {
+          if (options.headers.isNotNullAndNotEmpty) ...options.headers!,
+          if (scenario.isNotNullAndNotEmpty) 's': scenario,
+        },
+        method: method.name,
+        contentType: contentType,
+      );
 
       return Ok(
         await _dio.request<Object>(
@@ -182,11 +178,15 @@ abstract class ApiServiceCore {
 }
 
 enum RestMethod {
-  get,
-  post,
-  put,
-  delete,
-  patch,
+  get('GET'),
+  post('POST'),
+  put('PUT'),
+  delete('DELETE'),
+  patch('PATCH');
+
+  const RestMethod(this.name);
+
+  final String name;
 }
 
 const _genericErrorMessage = 'We were unable to complete your request. Please try again later.';
