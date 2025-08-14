@@ -54,7 +54,7 @@ abstract class ApiServiceCore {
     _testScenarios[url] = scenario;
   }
 
-  Future<Result<Object?, FailureFoundation>> request<T>({
+  Future<Result<Response<Object?>, FailureFoundation>> request<T>({
     required RestMethod method,
     required ApiUrlFoundation url,
     required Options options,
@@ -86,16 +86,16 @@ abstract class ApiServiceCore {
         _options = options;
       }
 
-      final _response = await _dio.request<Object>(
-        path,
-        data: data,
-        options: _options,
-        queryParameters: queryParameters,
-        cancelToken: cancelToken,
-        onSendProgress: onSendProgress,
+      return Ok(
+        await _dio.request<Object>(
+          path,
+          data: data,
+          options: _options,
+          queryParameters: queryParameters,
+          cancelToken: cancelToken,
+          onSendProgress: onSendProgress,
+        ),
       );
-
-      return Ok(_response.data);
     } on DioException catch (e, s) {
       return Err(_mapDioException(e, s, onError));
     }
