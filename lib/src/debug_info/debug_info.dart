@@ -1,6 +1,6 @@
 // Copyright (c) 2025 EShare Authors. All rights reserved.
 
-import 'package:basic_components/basic_components.dart';
+import 'package:better_components/better_components.dart';
 import 'package:corekit/corekit.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';

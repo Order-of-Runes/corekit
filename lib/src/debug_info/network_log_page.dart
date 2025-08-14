@@ -2,7 +2,7 @@
 
 import 'dart:convert';
 
-import 'package:basic_components/basic_components.dart';
+import 'package:better_components/better_components.dart';
 import 'package:corekit/src/api/helper/network_log.dart';
 import 'package:corekit/src/api/interceptors/dio_memory_logger.dart';
 import 'package:flutter/material.dart';
