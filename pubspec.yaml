@@ -12,7 +12,7 @@ dependencies:
     git:
       url: https://github.com/Order-of-Runes/basic_components.git
       ref: main
-  dio: ^5.8.0+1
+  dio: ^5.9.0
   equatable: ^2.0.7
   flutter:
     sdk: flutter
