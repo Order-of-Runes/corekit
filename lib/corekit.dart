@@ -19,7 +19,6 @@ export 'src/foundation/api_url_foundation.dart';
 export 'src/foundation/routes_foundation.dart';
 export 'src/foundation/url_prefix_foundation.dart';
 export 'src/future/composite_future.dart';
-export 'src/injector/injector_core.dart';
 export 'src/logcat/logcat.dart';
 export 'src/logcat/remote_log.dart';
 export 'src/modals/bottom_sheet_controller.dart';
