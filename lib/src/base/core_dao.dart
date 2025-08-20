@@ -9,5 +9,5 @@ abstract class CoreDao {
 
   CoreStore<T> openStore<T extends BaseModel>({String? suffix, bool eternal = false});
 
-  Future<void> runBatch();
+  Future<void> runBatch({bool eternal = false});
 }
