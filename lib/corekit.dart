@@ -6,6 +6,7 @@ export 'src/api/interceptors/dio_memory_logger.dart';
 export 'src/base/base_model.dart';
 export 'src/base/base_state.dart';
 export 'src/base/cache_lifetime/cache_lifetime.dart';
+export 'src/base/cache_lifetime/cache_lifetime_model.dart';
 export 'src/base/core_dao.dart';
 export 'src/base/core_list_model.dart';
 export 'src/base/core_remote.dart';
