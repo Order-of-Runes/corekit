@@ -12,6 +12,7 @@ export 'src/base/core_remote.dart';
 export 'src/base/core_repository.dart';
 export 'src/base/core_view_model.dart';
 export 'src/base/pagination_controller.dart';
+export 'src/base/root_repository.dart';
 export 'src/base_widgets/flux.dart';
 export 'src/debug_info/debug_info.dart';
 export 'src/debug_info/network_log_page.dart';
