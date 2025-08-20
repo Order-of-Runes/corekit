@@ -1,4 +1,4 @@
-// Copyright (c) 2024 EShare Authors. All rights reserved.
+// Copyright (c) 2024 Order of Runes Authors. All rights reserved.
 
 import 'dart:async';
 
@@ -34,14 +34,14 @@ abstract class CoreViewModel<S extends BaseState> extends ViewModelFoundation<S>
   /// If [suppress] is provided [Failure] will not be raised,
   /// [onError] will not be triggered
   @protected
-  Future<void> runGuarded(
+  Future<void> runGuarded<F extends FailureFoundation>(
     FutureOr<void> Function() block, {
-    void Function(FailureFoundation)? onError,
+    void Function(F)? onError,
     bool suppress = false,
   }) async {
     try {
       await block();
-    } on FailureFoundation catch (f) {
+    } on F catch (f) {
       if (!suppress) {
         if (onError.isNull) _raise(f);
         onError?.call(f);
@@ -57,7 +57,10 @@ abstract class CoreViewModel<S extends BaseState> extends ViewModelFoundation<S>
 
   /// Emits a [Failure] state based on the condition
   @protected
-  bool raise(FailureFoundation Function() failureBuilder, bool Function() block) {
+  bool raise<F extends FailureFoundation>(
+    F Function() failureBuilder,
+    bool Function() block,
+  ) {
     if (block()) {
       _raise(failureBuilder());
       return true;
@@ -69,8 +72,8 @@ abstract class CoreViewModel<S extends BaseState> extends ViewModelFoundation<S>
   ///
   /// This is the asynchronous version of [raise]
   @protected
-  Future<bool> raiseAsync(
-    FailureFoundation Function() failureBuilder,
+  Future<bool> raiseAsync<F extends FailureFoundation>(
+    F Function() failureBuilder,
     Future<bool> Function() block,
   ) async {
     if (await block()) {
@@ -84,7 +87,9 @@ abstract class CoreViewModel<S extends BaseState> extends ViewModelFoundation<S>
   ///
   /// Returns true if failure is successfully raised
   @protected
-  bool raiseIfError<T extends Object?>(Result<T, FailureFoundation> result) {
+  bool raiseIfError<T extends Object?, F extends FailureFoundation>(
+    Result<T, F> result,
+  ) {
     return result.match(
       ok: (_) => false,
       err: (error) {
@@ -98,11 +103,11 @@ abstract class CoreViewModel<S extends BaseState> extends ViewModelFoundation<S>
   ///
   /// Returns true if failure is successfully raised
   @protected
-  bool raiseIfErrors<T extends Object?>(
-    List<Result<T, FailureFoundation>> results,
-    FailureFoundation Function(List<FailureFoundation>) onFailure,
+  bool raiseIfErrors<T extends Object?, F extends FailureFoundation>(
+    List<Result<T, F>> results,
+    F Function(List<F>) onFailure,
   ) {
-    final List<FailureFoundation> failures = [];
+    final List<F> failures = [];
 
     for (final result in results) {
       if (result.isErr) {
@@ -144,7 +149,7 @@ abstract class CoreViewModel<S extends BaseState> extends ViewModelFoundation<S>
     ref.onDispose(cb);
   }
 
-  void _raise(FailureFoundation failure) {
+  void _raise<F extends FailureFoundation>(F failure) {
     emit(state.setFailure(failure) as S);
   }
 }

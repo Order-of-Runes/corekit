@@ -1,4 +1,4 @@
-// Copyright (c) 2025 EShare Authors. All rights reserved.
+// Copyright (c) 2025 Order of Runes Authors. All rights reserved.
 
 import 'package:animations/animations.dart';
 import 'package:corekit/src/modals/bottom_sheet_controller.dart';

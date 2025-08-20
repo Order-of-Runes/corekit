@@ -1,18 +1,15 @@
-// Copyright (c) 2024 EShare Authors. All rights reserved.
+// Copyright (c) 2024 Order of Runes Authors. All rights reserved.
 
 import 'package:corekit/src/api/api_service_core.dart';
-import 'package:corekit/src/injector/injector_core.dart';
 import 'package:flutter/foundation.dart';
 
-/// Base class for all remote data sources
-abstract class BaseRemote {
-  const BaseRemote(this.injector);
+/// Core class for all remote data sources
+abstract class CoreRemote<A extends ApiServiceCore> {
+  const CoreRemote();
 
-  final InjectorCore injector;
-
-  ApiServiceCore get api => injector.apiService;
+  A get api;
 
   /// Cancels service requests.
   @protected
-  void cancel([dynamic message]) => api.cancelToken?.cancel(message);
+  void cancel([dynamic message]);
 }

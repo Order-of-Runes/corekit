@@ -1,4 +1,4 @@
-// Copyright (c) 2024 EShare Authors. All rights reserved.
+// Copyright (c) 2024 Order of Runes Authors. All rights reserved.
 
 // ignore_for_file: implementation_imports
 

@@ -1,4 +1,4 @@
-// Copyright (c) 2025 EShare Authors. All rights reserved.
+// Copyright (c) 2025 Order of Runes Authors. All rights reserved.
 
 import 'package:corekit/src/foundation/routes_foundation.dart';
 import 'package:corekit/src/logcat/logcat.dart';

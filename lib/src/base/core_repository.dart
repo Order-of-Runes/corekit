@@ -1,15 +1,16 @@
-// Copyright (c) 2025 EShare Authors. All rights reserved.
+// Copyright (c) 2025 Order of Runes Authors. All rights reserved.
 
 import 'dart:async';
 
-import 'package:corekit/src/base/base_dao.dart';
+import 'package:corekit/src/api/api_service_core.dart';
 import 'package:corekit/src/base/base_model.dart';
-import 'package:corekit/src/base/base_remote.dart';
 import 'package:corekit/src/base/cache_lifetime/cache_lifetime.dart';
 import 'package:corekit/src/base/cache_lifetime/cache_lifetime_model.dart';
+import 'package:corekit/src/base/core_dao.dart';
 import 'package:corekit/src/base/core_list_model.dart';
-import 'package:corekit/src/base/core_repository.dart';
+import 'package:corekit/src/base/core_remote.dart';
 import 'package:corekit/src/base/pagination_controller.dart';
+import 'package:corekit/src/base/root_repository.dart';
 import 'package:corekit/src/store/store.dart';
 import 'package:flutter/foundation.dart';
 import 'package:foundation/foundation.dart';
@@ -18,24 +19,22 @@ import 'package:utils/utils.dart';
 
 typedef RemoteTransformer<R, C> = C Function(R);
 
-class BaseRepository<R extends BaseRemote, D extends CoreDao> extends CoreRepository<R> {
-  BaseRepository(super.injector, super.remote, this.dao);
+abstract class CoreRepository<A extends ApiServiceCore, R extends CoreRemote<A>, D extends CoreDao> extends RootRepository<A, R> {
+  CoreRepository(super.remote, this.dao);
 
   final D dao;
 
-  CoreStore<CacheLifetimeModel> _cacheLTStore({bool eternal = false}) {
-    return eternal ? injector.eternalDatabase.openStore() : injector.database.openStore();
-  }
+  CoreStore<CacheLifetimeModel> _cacheLTStore({bool eternal = false});
 
   @protected
-  Future<Result<T, FailureFoundation>> resolve<T>({
-    required Future<Result<T, FailureFoundation>> Function() onRemote,
+  Future<Result<T, F>> resolve<T, F extends FailureFoundation>({
+    required Future<Result<T, F>> Function() onRemote,
     FutureOr<void> Function(T)? onSave,
-    FutureOr<Result<T, FailureFoundation>> Function()? onCache,
+    FutureOr<Result<T, F>> Function()? onCache,
     bool preferCache = false,
     CacheLifetime? cacheLifetime,
   }) {
-    return resolveWithTransform(
+    return resolveWithTransform<T, T, F>(
       onRemote: onRemote,
       onSave: onSave,
       onCache: onCache,
@@ -45,29 +44,29 @@ class BaseRepository<R extends BaseRemote, D extends CoreDao> extends CoreReposi
   }
 
   @protected
-  Future<Result<C, FailureFoundation>> resolveWithTransform<T, C>({
-    required Future<Result<T, FailureFoundation>> Function() onRemote,
+  Future<Result<C, F>> resolveWithTransform<T, C, F extends FailureFoundation>({
+    required Future<Result<T, F>> Function() onRemote,
     FutureOr<void> Function(T)? onSave,
-    FutureOr<Result<C, FailureFoundation>> Function()? onCache,
+    FutureOr<Result<C, F>> Function()? onCache,
     bool preferCache = false,
     CacheLifetime? cacheLifetime,
     RemoteTransformer<T, C>? transformer,
   }) async {
     assert((onCache.isNotNull && onSave.isNotNull) || onCache.isNull, 'When [onCache] is passed, [onSave] needs to be passed as well');
-    final _EagerCacheResult<T, C> eagerResult;
+    final _EagerCacheResult<T, C, F> eagerResult;
 
     if (preferCache) {
-      eagerResult = await _onEagerCache<T, C>(onRemote, onCache);
+      eagerResult = await _onEagerCache<T, C, F>(onRemote, onCache);
     } else {
       final cacheModel = cacheLifetime.isNull
           ? null
           : (await _cacheLTStore(eternal: cacheLifetime!.eternal).fetchFirst(primaryKey: cacheLifetime.key)).ok;
       final hasCacheExpired = cacheLifetime?.hasExpired(cacheModel?.lifetime) ?? true;
 
-      if (hasCacheExpired && injector.network.isAvailable) {
+      if (hasCacheExpired && isNetworkAvailable) {
         eagerResult = _EagerCacheResult.remote(await invoke(onRemote: onRemote));
       } else {
-        eagerResult = await _onEagerCache<T, C>(onRemote, onCache);
+        eagerResult = await _onEagerCache<T, C, F>(onRemote, onCache);
       }
     }
 
@@ -97,17 +96,17 @@ class BaseRepository<R extends BaseRemote, D extends CoreDao> extends CoreReposi
   }
 
   @protected
-  Future<Result<List<T>, FailureFoundation>> resolvedPaginated<T extends BaseModel>({
+  Future<Result<List<T>, F>> resolvedPaginated<T extends BaseModel, F extends FailureFoundation>({
     required PaginationController controller,
-    required Future<Result<CoreListModel<T>, FailureFoundation>> Function(Map<String, int> params) onRemote,
+    required Future<Result<CoreListModel<T>, F>> Function(Map<String, int> params) onRemote,
     FutureOr<void> Function(List<T>, {bool clear})? onSave,
-    FutureOr<Result<List<T>, FailureFoundation>> Function()? onCache,
+    FutureOr<Result<List<T>, F>> Function()? onCache,
     bool preferCache = false,
     CacheLifetime? cacheLifetime,
   }) {
-    return resolve<List<T>>(
+    return resolve<List<T>, F>(
       onRemote: () async {
-        final unwrapped = controller.unwrapPaginated(await onRemote(controller.paginationParams));
+        final unwrapped = controller.unwrapPaginated<T, F>(await onRemote(controller.paginationParams));
         if (onSave.isNull) controller.bumpPage();
         return unwrapped;
       },
@@ -124,18 +123,18 @@ class BaseRepository<R extends BaseRemote, D extends CoreDao> extends CoreReposi
   }
 
   @protected
-  Future<Result<List<C>, FailureFoundation>> resolvedPaginatedWithTransform<T extends BaseModel, C extends BaseModel>({
+  Future<Result<List<C>, F>> resolvedPaginatedWithTransform<T extends BaseModel, C extends BaseModel, F extends FailureFoundation>({
     required PaginationController controller,
-    required Future<Result<CoreListModel<T>, FailureFoundation>> Function(Map<String, int> params) onRemote,
+    required Future<Result<CoreListModel<T>, F>> Function(Map<String, int> params) onRemote,
     FutureOr<void> Function(List<T>, {bool clear})? onSave,
-    FutureOr<Result<List<C>, FailureFoundation>> Function()? onCache,
+    FutureOr<Result<List<C>, F>> Function()? onCache,
     bool preferCache = false,
     CacheLifetime? cacheLifetime,
     RemoteTransformer<List<T>, List<C>>? transformer,
   }) {
-    return resolveWithTransform<List<T>, List<C>>(
+    return resolveWithTransform<List<T>, List<C>, F>(
       onRemote: () async {
-        final unwrapped = controller.unwrapPaginated(await onRemote(controller.paginationParams));
+        final unwrapped = controller.unwrapPaginated<T, F>(await onRemote(controller.paginationParams));
         if (onSave.isNull) controller.bumpPage();
         return unwrapped;
       },
@@ -152,25 +151,27 @@ class BaseRepository<R extends BaseRemote, D extends CoreDao> extends CoreReposi
     );
   }
 
+  @protected
+  bool get isNetworkAvailable;
+
   /// Tries with remote if cache does not have data
-  Future<_EagerCacheResult<T, C>> _onEagerCache<T, C>(
-    Future<Result<T, FailureFoundation>> Function() onRemote,
-    FutureOr<Result<C, FailureFoundation>> Function()? onCache,
+  Future<_EagerCacheResult<T, C, F>> _onEagerCache<T, C, F extends FailureFoundation>(
+    Future<Result<T, F>> Function() onRemote,
+    FutureOr<Result<C, F>> Function()? onCache,
   ) async {
     final cacheResult = onCache.isNull ? null : (await onCache!());
     final cache = cacheResult?.ok;
 
     if (cache.isNull) {
-      final hasNetwork = injector.network.isAvailable;
-
       return _EagerCacheResult.remote(
-        hasNetwork
+        isNetworkAvailable
             ? (await invoke(onRemote: onRemote))
             : Err(
                 const FailureFoundation(
-                  'No Internet detected. Please check your internet connection.',
-                  source: 'network',
-                ),
+                      'No Internet detected. Please check your internet connection.',
+                      source: 'network',
+                    )
+                    as F,
               ),
       );
     }
@@ -189,19 +190,28 @@ class BaseRepository<R extends BaseRemote, D extends CoreDao> extends CoreReposi
   }
 }
 
-class _EagerCacheResult<T, C> {
-  const _EagerCacheResult._({required this.remote, required this.cache});
+class _EagerCacheResult<T, C, F extends FailureFoundation> {
+  const _EagerCacheResult._({
+    required this.remote,
+    required this.cache,
+  });
 
-  factory _EagerCacheResult.remote(Result<T, FailureFoundation> result) {
-    return _EagerCacheResult._(remote: result, cache: null);
+  factory _EagerCacheResult.remote(Result<T, F> result) {
+    return _EagerCacheResult._(
+      remote: result,
+      cache: null,
+    );
   }
 
-  factory _EagerCacheResult.cache(Result<C, FailureFoundation> result) {
-    return _EagerCacheResult._(remote: null, cache: result);
+  factory _EagerCacheResult.cache(Result<C, F> result) {
+    return _EagerCacheResult._(
+      remote: null,
+      cache: result,
+    );
   }
 
-  final Result<T, FailureFoundation>? remote;
-  final Result<C, FailureFoundation>? cache;
+  final Result<T, F>? remote;
+  final Result<C, F>? cache;
 
   bool get fromCache {
     assert(remote.isNotNull || cache.isNotNull, 'Result from either remote or cache should be provided');

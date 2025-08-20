@@ -1,4 +1,4 @@
-// Copyright (c) 2025 EShare Authors. All rights reserved.
+// Copyright (c) 2025 Order of Runes Authors. All rights reserved.
 
 import 'package:corekit/src/api/helper/header_resolver.dart';
 import 'package:corekit/src/api/helper/network_log.dart';

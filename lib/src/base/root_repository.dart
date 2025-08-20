@@ -1,33 +1,32 @@
-// Copyright (c) 2025 EShare Authors. All rights reserved.
+// Copyright (c) 2025 Order of Runes Authors. All rights reserved.
 
 import 'dart:async';
 
+import 'package:corekit/src/api/api_service_core.dart';
 import 'package:corekit/src/base/base_model.dart';
-import 'package:corekit/src/base/base_remote.dart';
 import 'package:corekit/src/base/core_list_model.dart';
+import 'package:corekit/src/base/core_remote.dart';
 import 'package:corekit/src/base/pagination_controller.dart';
-import 'package:corekit/src/injector/injector_core.dart';
 import 'package:flutter/foundation.dart';
 import 'package:foundation/foundation.dart';
 import 'package:rusty_dart/rusty_dart.dart';
 
-abstract class CoreRepository<R extends BaseRemote> {
-  CoreRepository(this.injector, this.remote);
+abstract class RootRepository<A extends ApiServiceCore, R extends CoreRemote<A>> {
+  RootRepository(this.remote);
 
-  final InjectorCore injector;
   final R remote;
 
   @protected
-  Future<Result<T, FailureFoundation>> invoke<T>({
-    required Future<Result<T, FailureFoundation>> Function() onRemote,
+  Future<Result<T, F>> invoke<T, F extends FailureFoundation>({
+    required Future<Result<T, F>> Function() onRemote,
   }) {
     return onRemote();
   }
 
   @protected
-  Future<Result<List<T>, FailureFoundation>> invokePaginated<T extends BaseModel>({
+  Future<Result<List<T>, F>> invokePaginated<T extends BaseModel, F extends FailureFoundation>({
     required PaginationController controller,
-    required Future<Result<CoreListModel<T>, FailureFoundation>> Function(Map<String, int>) onRemote,
+    required Future<Result<CoreListModel<T>, F>> Function(Map<String, int>) onRemote,
   }) async {
     final unwrapped = controller.unwrapPaginated(await onRemote(controller.paginationParams));
     controller.bumpPage();

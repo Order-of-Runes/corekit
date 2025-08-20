@@ -1,7 +1,8 @@
-// Copyright (c) 2025 EShare Authors. All rights reserved.
+// Copyright (c) 2025 Order of Runes Authors. All rights reserved.
 
 import 'package:better_components/better_components.dart';
-import 'package:corekit/corekit.dart';
+import 'package:corekit/src/router/router.dart';
+import 'package:corekit/src/widgets/route_listener.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
