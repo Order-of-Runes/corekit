@@ -87,8 +87,8 @@ abstract class CoreViewModel<S extends BaseState> extends ViewModelFoundation<S>
   ///
   /// Returns true if failure is successfully raised
   @protected
-  bool raiseIfError<T extends Object?, F extends FailureFoundation>(
-    Result<T, F> result,
+  bool raiseIfError<F extends FailureFoundation>(
+    Result<dynamic, F> result,
   ) {
     return result.match(
       ok: (_) => false,
@@ -103,8 +103,8 @@ abstract class CoreViewModel<S extends BaseState> extends ViewModelFoundation<S>
   ///
   /// Returns true if failure is successfully raised
   @protected
-  bool raiseIfErrors<T extends Object?, F extends FailureFoundation>(
-    List<Result<T, F>> results,
+  bool raiseIfErrors<F extends FailureFoundation>(
+    List<Result<dynamic, F>> results,
     F Function(List<F>) onFailure,
   ) {
     final List<F> failures = [];
