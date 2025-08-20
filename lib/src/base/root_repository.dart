@@ -12,7 +12,7 @@ import 'package:foundation/foundation.dart';
 import 'package:rusty_dart/rusty_dart.dart';
 
 abstract class RootRepository<A extends ApiServiceCore, R extends CoreRemote<A>> {
-  RootRepository(this.remote);
+  const RootRepository(this.remote);
 
   final R remote;
 

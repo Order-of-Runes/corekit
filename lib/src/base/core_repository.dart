@@ -20,11 +20,11 @@ import 'package:utils/utils.dart';
 typedef RemoteTransformer<R, C> = C Function(R);
 
 abstract class CoreRepository<A extends ApiServiceCore, R extends CoreRemote<A>, D extends CoreDao> extends RootRepository<A, R> {
-  CoreRepository(super.remote, this.dao);
+  const CoreRepository(super.remote, this.dao);
 
   final D dao;
 
-  CoreStore<CacheLifetimeModel> _cacheLTStore({bool eternal = false});
+  CoreStore<CacheLifetimeModel> getCacheLTStore({bool eternal = false});
 
   @protected
   Future<Result<T, F>> resolve<T, F extends FailureFoundation>({
@@ -60,7 +60,7 @@ abstract class CoreRepository<A extends ApiServiceCore, R extends CoreRemote<A>,
     } else {
       final cacheModel = cacheLifetime.isNull
           ? null
-          : (await _cacheLTStore(eternal: cacheLifetime!.eternal).fetchFirst(primaryKey: cacheLifetime.key)).ok;
+          : (await getCacheLTStore(eternal: cacheLifetime!.eternal).fetchFirst(primaryKey: cacheLifetime.key)).ok;
       final hasCacheExpired = cacheLifetime?.hasExpired(cacheModel?.lifetime) ?? true;
 
       if (hasCacheExpired && isNetworkAvailable) {
@@ -79,7 +79,7 @@ abstract class CoreRepository<A extends ApiServiceCore, R extends CoreRemote<A>,
         if (onSave.isNotNull) {
           await onSave!(value);
           if (cacheLifetime.isNotNull) {
-            _cacheLTStore(
+            getCacheLTStore(
               eternal: cacheLifetime!.eternal,
             ).insert([CacheLifetimeModel(key: cacheLifetime.key, lifetime: cacheLifetime.timeStamp)]);
           }
