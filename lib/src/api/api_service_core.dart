@@ -8,7 +8,7 @@ import 'package:foundation/foundation.dart';
 import 'package:rusty_dart/rusty_dart.dart';
 import 'package:utils/utils.dart';
 
-typedef OnApiError = F Function<F extends FailureFoundation>(Map<String, dynamic>);
+typedef OnApiError<F extends FailureFoundation> = F Function(Map<String, dynamic>);
 
 abstract class ApiServiceCore {
   ApiServiceCore({
@@ -65,7 +65,7 @@ abstract class ApiServiceCore {
     UrlPrefixFoundation? prefix,
     ProgressCallback? onSendProgress,
     bool isTest = false,
-    OnApiError? onError,
+    OnApiError<F>? onError,
   }) async {
     if (cancelToken?.isCancelled ?? false) cancelToken = CancelToken();
 
@@ -93,14 +93,14 @@ abstract class ApiServiceCore {
         ),
       );
     } on DioException catch (e, s) {
-      return Err(_mapDioException<F>(e, s, onError));
+      return Err(_mapDioException<F>(e, s, onError) as F);
     }
   }
 
-  F _mapDioException<F extends FailureFoundation>(
+  FailureFoundation _mapDioException<F extends FailureFoundation>(
     DioException exception,
     StackTrace stackTrace,
-    OnApiError? onError,
+    OnApiError<F>? onError,
   ) {
     switch (exception.type) {
       case DioExceptionType.connectionTimeout:
@@ -110,7 +110,7 @@ abstract class ApiServiceCore {
           'Connection Timeout',
           source: 'connectionTimeout',
           detail: 'There was a problem while completing your request. Please try again later.',
-        ) as F;
+        );
       case DioExceptionType.badResponse:
         final statusCode = exception.response?.statusCode;
         if (statusCode == 500 || statusCode == 503) {
@@ -119,7 +119,7 @@ abstract class ApiServiceCore {
             detail: 'The server encountered an error & was unable to complete your request. Please try again later.',
             source: 'api',
             code: double.tryParse(statusCode?.toString() ?? '500'),
-          ) as F;
+          );
         }
 
         final data = exception.response?.data;
@@ -129,7 +129,7 @@ abstract class ApiServiceCore {
             detail: _genericErrorMessage,
             code: 404,
             source: 'api',
-          ) as F;
+          );
         }
 
         if (data is String) {
@@ -137,15 +137,15 @@ abstract class ApiServiceCore {
             exception.message ?? '',
             detail: data,
             source: 'api',
-          ) as F;
+          );
         }
 
         if (data is Map<String, dynamic> && onError.isNotNull) return onError!(data);
 
-        return const FailureFoundation(_genericErrorMessage, source: 'api') as F;
+        return const FailureFoundation(_genericErrorMessage, source: 'api');
 
       case DioExceptionType.cancel:
-        return const FailureFoundation('Request Cancelled', code: 100, source: 'cancel') as F;
+        return const FailureFoundation('Request Cancelled', code: 100, source: 'cancel');
       case DioExceptionType.badCertificate:
       case DioExceptionType.connectionError:
       case DioExceptionType.unknown:
@@ -156,7 +156,7 @@ abstract class ApiServiceCore {
           detail: _error.toString(),
           stackTrace: stackTrace,
           source: 'network',
-        ) as F;
+        );
     }
   }
 
