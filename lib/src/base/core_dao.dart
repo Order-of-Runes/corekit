@@ -7,7 +7,7 @@ import 'package:corekit/src/store/store.dart';
 abstract class CoreDao {
   const CoreDao();
 
-  S openStore<T extends BaseModel, S extends CoreStore<T>>({String? suffix, bool eternal = false});
+  CoreStore<T> openStore<T extends BaseModel>({String? suffix, bool eternal = false});
 
   Future<void> runBatch();
 }
