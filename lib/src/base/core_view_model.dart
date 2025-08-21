@@ -1,7 +1,6 @@
 // Copyright (c) 2024 Order of Runes Authors. All rights reserved.
 
 import 'dart:async';
-import 'dart:nativewrappers/_internal/vm/lib/ffi_allocation_patch.dart';
 
 import 'package:corekit/src/base/base_state.dart';
 import 'package:corekit/src/logcat/logcat.dart';
