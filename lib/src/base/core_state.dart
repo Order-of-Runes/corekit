@@ -2,9 +2,9 @@
 
 import 'package:foundation/foundation.dart';
 
-abstract class CoreState extends StateFoundation {
+abstract class CoreState<E extends Exception> extends StateFoundation {
   const CoreState({
-    this.exception,
+    this.failure,
     this.loading = Loading.inline,
     this.failureDisplay = FailureDisplay.inline,
     String? loadingTitle,
@@ -13,7 +13,7 @@ abstract class CoreState extends StateFoundation {
   }) : _loadingTitle = loadingTitle,
        _loadingSubtitle = loadingSubtitle;
 
-  final Exception? exception;
+  final E? failure;
   final Loading loading;
   final FailureDisplay failureDisplay;
   final String? _loadingTitle;
@@ -24,7 +24,7 @@ abstract class CoreState extends StateFoundation {
   /// Only applies to [Loading.progressDialog]
   final bool canDismissLoading;
 
-  CoreState setFailure(Exception failure);
+  CoreState setFailure(E failure);
 
   CoreState setFailureDisplay(FailureDisplay display);
 
@@ -36,7 +36,7 @@ abstract class CoreState extends StateFoundation {
   });
 
   @override
-  bool get hasFailed => exception != null;
+  bool get hasFailed => failure != null;
 
   @override
   bool get isLoading => loading != Loading.none;
