@@ -1,14 +1,14 @@
 // Copyright (c) 2024 Order of Runes Authors. All rights reserved.
 
+import 'package:corekit/src/exception/corekit_exception.dart';
 import 'package:corekit/src/foundation/api_url_foundation.dart';
 import 'package:corekit/src/foundation/url_prefix_foundation.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter/foundation.dart';
-import 'package:foundation/foundation.dart';
 import 'package:rusty_dart/rusty_dart.dart';
 import 'package:utils/utils.dart';
 
-typedef OnApiError<F extends FailureFoundation> = F Function(Map<String, dynamic>);
+typedef OnApiError = CorekitException Function(Map<String, dynamic>);
 
 abstract class ApiServiceCore {
   ApiServiceCore({
@@ -54,7 +54,7 @@ abstract class ApiServiceCore {
     _testScenarios[url] = scenario;
   }
 
-  Future<Result<Response<Object?>, F>> request<T, F extends FailureFoundation>({
+  Future<Result<Response<Object?>, CorekitException>> request<T>({
     required RestMethod method,
     required ApiUrlFoundation url,
     required Options options,
@@ -65,7 +65,7 @@ abstract class ApiServiceCore {
     UrlPrefixFoundation? prefix,
     ProgressCallback? onSendProgress,
     bool isTest = false,
-    OnApiError<F>? onError,
+    OnApiError? onError,
   }) async {
     if (cancelToken?.isCancelled ?? false) cancelToken = CancelToken();
 
@@ -93,69 +93,64 @@ abstract class ApiServiceCore {
         ),
       );
     } on DioException catch (e, s) {
-      return Err(_mapDioException<F>(e, s, onError) as F);
+      return Err(_mapDioException(e, s, onError));
     }
   }
 
-  FailureFoundation _mapDioException<F extends FailureFoundation>(
+  CorekitException _mapDioException(
     DioException exception,
     StackTrace stackTrace,
-    OnApiError<F>? onError,
+    OnApiError? onError,
   ) {
     switch (exception.type) {
       case DioExceptionType.connectionTimeout:
       case DioExceptionType.sendTimeout:
       case DioExceptionType.receiveTimeout:
-        return const FailureFoundation(
+        return const CorekitException(
           'Connection Timeout',
-          source: 'connectionTimeout',
           detail: 'There was a problem while completing your request. Please try again later.',
         );
       case DioExceptionType.badResponse:
         final statusCode = exception.response?.statusCode;
         if (statusCode == 500 || statusCode == 503) {
-          return FailureFoundation(
+          return CorekitException(
             'Internal server error',
             detail: 'The server encountered an error & was unable to complete your request. Please try again later.',
-            source: 'api',
-            code: double.tryParse(statusCode?.toString() ?? '500'),
+            code: int.tryParse(statusCode?.toString() ?? '500'),
           );
         }
 
         final data = exception.response?.data;
         if (data == null || (statusCode == 404 && data == null)) {
-          return const FailureFoundation(
+          return const CorekitException(
             'No Data',
             detail: _genericErrorMessage,
             code: 404,
-            source: 'api',
           );
         }
 
         if (data is String) {
-          return FailureFoundation(
+          return CorekitException(
             exception.message ?? '',
             detail: data,
-            source: 'api',
           );
         }
 
         if (data is Map<String, dynamic> && onError.isNotNull) return onError!(data);
 
-        return const FailureFoundation(_genericErrorMessage, source: 'api');
+        return const CorekitException(_genericErrorMessage);
 
       case DioExceptionType.cancel:
-        return const FailureFoundation('Request Cancelled', code: 100, source: 'cancel');
+        return const CorekitException('Request Cancelled', code: 100);
       case DioExceptionType.badCertificate:
       case DioExceptionType.connectionError:
       case DioExceptionType.unknown:
         final _error = exception.error;
 
-        return FailureFoundation(
+        return CorekitException(
           _error.toString(),
           detail: _error.toString(),
           stackTrace: stackTrace,
-          source: 'network',
         );
     }
   }
