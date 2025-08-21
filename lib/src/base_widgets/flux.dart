@@ -2,14 +2,14 @@
 
 //ignore_for_file: avoid_positional_boolean_parameters
 
-import 'package:corekit/corekit.dart';
+import 'package:corekit/src/base/core_state.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-typedef OnFluxDialog<S extends BaseState> = void Function(S, bool);
+typedef OnFluxDialog<S extends CoreState> = void Function(S, bool);
 
 /// Wrap your page with Flux to handle your side effects
-class FluxCore<VM extends AutoDisposeNotifier<S>, S extends BaseState> extends StatelessWidget {
+class FluxCore<VM extends AutoDisposeNotifier<S>, S extends CoreState> extends StatelessWidget {
   const FluxCore({
     super.key,
     required this.provider,
@@ -40,7 +40,7 @@ class FluxCore<VM extends AutoDisposeNotifier<S>, S extends BaseState> extends S
   }
 }
 
-class StickyFluxCore<VM extends Notifier<S>, S extends BaseState> extends StatelessWidget {
+class StickyFluxCore<VM extends Notifier<S>, S extends CoreState> extends StatelessWidget {
   const StickyFluxCore({
     super.key,
     required this.provider,
@@ -71,7 +71,7 @@ class StickyFluxCore<VM extends Notifier<S>, S extends BaseState> extends Statel
   }
 }
 
-void _onListen<S extends BaseState>({
+void _onListen<S extends CoreState>({
   required OnFluxDialog<S> onDialog,
   required void Function(S) onError,
   required S? oldState,

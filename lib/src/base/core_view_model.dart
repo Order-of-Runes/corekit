@@ -2,14 +2,14 @@
 
 import 'dart:async';
 
-import 'package:corekit/src/base/base_state.dart';
+import 'package:corekit/src/base/core_state.dart';
 import 'package:corekit/src/logcat/logcat.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:rusty_dart/rusty_dart.dart';
 import 'package:utils/utils.dart';
 
-abstract class CoreViewModel<S extends BaseState> extends AutoDisposeNotifier<S> {
+abstract class CoreViewModel<S extends CoreState> extends AutoDisposeNotifier<S> {
   CoreViewModel({this.enableLog = false}) : logcat = Logcat();
 
   final Logcat logcat;

@@ -2,8 +2,8 @@
 
 import 'package:foundation/foundation.dart';
 
-abstract class BaseState extends StateFoundation {
-  const BaseState({
+abstract class CoreState extends StateFoundation {
+  const CoreState({
     this.failure,
     this.loading = Loading.inline,
     this.failureDisplay = FailureDisplay.inline,
@@ -24,11 +24,11 @@ abstract class BaseState extends StateFoundation {
   /// Only applies to [Loading.progressDialog]
   final bool canDismissLoading;
 
-  BaseState setFailure(Exception failure);
+  CoreState setFailure(Exception failure);
 
-  BaseState setFailureDisplay(FailureDisplay display);
+  CoreState setFailureDisplay(FailureDisplay display);
 
-  BaseState setLoading({
+  CoreState setLoading({
     Loading loading = Loading.inline,
     String? title,
     String? subtitle,
