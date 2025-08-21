@@ -5,11 +5,11 @@ import 'dart:async';
 import 'package:corekit/src/base/base_state.dart';
 import 'package:corekit/src/logcat/logcat.dart';
 import 'package:flutter/foundation.dart';
-import 'package:foundation/foundation.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:rusty_dart/rusty_dart.dart';
 import 'package:utils/utils.dart';
 
-abstract class CoreViewModel<S extends BaseState> extends ViewModelFoundation<S> {
+abstract class CoreViewModel<S extends BaseState> extends AutoDisposeNotifier<S> {
   CoreViewModel({this.enableLog = false}) : logcat = Logcat();
 
   final Logcat logcat;
@@ -34,14 +34,14 @@ abstract class CoreViewModel<S extends BaseState> extends ViewModelFoundation<S>
   /// If [suppress] is provided [Failure] will not be raised,
   /// [onError] will not be triggered
   @protected
-  Future<void> runGuarded<F extends FailureFoundation>(
+  Future<void> runGuarded<E extends Exception>(
     FutureOr<void> Function() block, {
-    void Function(F)? onError,
+    void Function(E)? onError,
     bool suppress = false,
   }) async {
     try {
       await block();
-    } on F catch (f) {
+    } on E catch (f) {
       if (!suppress) {
         if (onError.isNull) _raise(f);
         onError?.call(f);
@@ -57,8 +57,8 @@ abstract class CoreViewModel<S extends BaseState> extends ViewModelFoundation<S>
 
   /// Emits a [Failure] state based on the condition
   @protected
-  bool raise<F extends FailureFoundation>(
-    F Function() failureBuilder,
+  bool raise<E extends Exception>(
+    E Function() failureBuilder,
     bool Function() block,
   ) {
     if (block()) {
@@ -72,8 +72,8 @@ abstract class CoreViewModel<S extends BaseState> extends ViewModelFoundation<S>
   ///
   /// This is the asynchronous version of [raise]
   @protected
-  Future<bool> raiseAsync<F extends FailureFoundation>(
-    F Function() failureBuilder,
+  Future<bool> raiseAsync<E extends Exception>(
+    E Function() failureBuilder,
     Future<bool> Function() block,
   ) async {
     if (await block()) {
@@ -87,8 +87,8 @@ abstract class CoreViewModel<S extends BaseState> extends ViewModelFoundation<S>
   ///
   /// Returns true if failure is successfully raised
   @protected
-  bool raiseIfError<F extends FailureFoundation>(
-    Result<dynamic, F> result,
+  bool raiseIfError<E extends Exception>(
+    Result<dynamic, E> result,
   ) {
     return result.match(
       ok: (_) => false,
@@ -103,11 +103,11 @@ abstract class CoreViewModel<S extends BaseState> extends ViewModelFoundation<S>
   ///
   /// Returns true if failure is successfully raised
   @protected
-  bool raiseIfErrors<F extends FailureFoundation>(
-    List<Result<dynamic, F>> results,
-    F Function(List<F>) onFailure,
+  bool raiseIfErrors<E extends Exception>(
+    List<Result<dynamic, E>> results,
+    E Function(List<E>) onFailure,
   ) {
-    final List<F> failures = [];
+    final List<E> failures = [];
 
     for (final result in results) {
       if (result.isErr) {
@@ -149,7 +149,7 @@ abstract class CoreViewModel<S extends BaseState> extends ViewModelFoundation<S>
     ref.onDispose(cb);
   }
 
-  void _raise<F extends FailureFoundation>(F failure) {
+  void _raise(Exception failure) {
     emit(state.setFailure(failure) as S);
   }
 }

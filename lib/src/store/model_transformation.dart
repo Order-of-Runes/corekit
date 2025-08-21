@@ -1,21 +1,20 @@
 // Copyright (c) 2025 Order of Runes Authors. All rights reserved.
 
 import 'package:corekit/src/base/base_model.dart';
-import 'package:foundation/foundation.dart';
 import 'package:rusty_dart/rusty_dart.dart';
 import 'package:sembast/sembast.dart';
 import 'package:utils/utils.dart';
 
-typedef ModelResolver<T extends BaseModel> = Result<T, FailureFoundation> Function(Map<String, dynamic>);
+typedef ModelResolver<T extends BaseModel, E extends Exception> = Result<T, E> Function(Map<String, dynamic>);
 
 mixin ModelTransformation {
   /// Transform list of records from db into grouped list of models of type [T]
-  Result<Map<String, List<T>>, FailureFoundation> transformMapToGroup<T extends BaseModel>({
+  Result<Map<String, List<T>>, E> transformMapToGroup<T extends BaseModel, E extends Exception>({
     required String groupBy,
     required List<RecordSnapshot<String, Map<String, Object?>>> records,
-    required ModelResolver<T> resolver,
+    required ModelResolver<T, E> resolver,
   }) {
-    FailureFoundation? failure;
+    E? failure;
     final result = <String, List<T>>{};
 
     for (final record in records) {
@@ -39,7 +38,7 @@ mixin ModelTransformation {
   }
 
   /// Transform list of models into grouped list of models of type [T]
-  Result<Map<String, List<T>>, FailureFoundation> transformModelToGroup<T extends BaseModel>({
+  Result<Map<String, List<T>>, E> transformModelToGroup<T extends BaseModel, E extends Exception>({
     required String groupBy,
     required List<T> records,
   }) {

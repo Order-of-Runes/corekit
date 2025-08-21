@@ -5,7 +5,6 @@
 import 'package:corekit/src/base/base_model.dart';
 import 'package:corekit/src/store/model_transformation.dart';
 import 'package:flutter/foundation.dart';
-import 'package:foundation/foundation.dart';
 import 'package:path/path.dart';
 import 'package:rusty_dart/rusty_dart.dart';
 import 'package:sembast/sembast.dart';
@@ -131,7 +130,7 @@ abstract class CoreStore<T extends BaseModel> with ModelTransformation {
 
   /// Fetch data from the [CoreStore].
   /// via the usage of either [primaryKey] or [finder] to filter records.
-  Future<Result<List<T>, FailureFoundation>> fetch({String? primaryKey, Finder? finder}) async {
+  Future<Result<List<T>, E>> fetch<E extends Exception>({String? primaryKey, Finder? finder}) async {
     assert(primaryKey.isNull || finder.isNull, "Both 'primaryKey' and 'finder' can't be used at the same time.");
 
     if (primaryKey.isNotNull) {
@@ -139,14 +138,14 @@ abstract class CoreStore<T extends BaseModel> with ModelTransformation {
 
       if (record.isNull) return Ok([]);
 
-      return toModel(record!).match(ok: (value) => Ok([value]), err: (e) => Err(e));
+      return toModel<E>(record!).match(ok: (value) => Ok([value]), err: (e) => Err(e));
     }
     final records = await _ref.find(_db, finder: finder);
     final models = <T>[];
-    FailureFoundation? failure;
+    E? failure;
 
     for (final record in records) {
-      final model = toModel(record.value);
+      final model = toModel<E>(record.value);
       if (model.isErr) {
         failure = model.err!;
         break;
@@ -188,13 +187,13 @@ abstract class CoreStore<T extends BaseModel> with ModelTransformation {
   ///            ],
   /// }
   /// ```
-  Future<Result<Map<String, List<T>>, FailureFoundation>> fetchAndGroup({
+  Future<Result<Map<String, List<T>>, E>> fetchAndGroup<E extends Exception>({
     required String groupBy,
     Finder? finder,
   }) async {
     final records = await _ref.find(_db, finder: finder);
 
-    return transformMapToGroup(
+    return transformMapToGroup<T, E>(
       groupBy: groupBy,
       records: records,
       resolver: toModel,
@@ -204,7 +203,7 @@ abstract class CoreStore<T extends BaseModel> with ModelTransformation {
   /// Fetches the first data from the [CoreStore].
   ///
   /// Either use [primaryKey] or [finder] to filter records.
-  Future<Result<T, FailureFoundation>> fetchFirst({String? primaryKey, Finder? finder}) async {
+  Future<Result<T, E>> fetchFirst<E extends Exception>({String? primaryKey, Finder? finder}) async {
     assert(
       primaryKey.isNull || finder.isNull,
       "Both 'primaryKey' and 'finder' can't be used at the same time.",
@@ -218,16 +217,9 @@ abstract class CoreStore<T extends BaseModel> with ModelTransformation {
       record = await _ref.record(primaryKey!).get(_db);
     }
 
-    if (record.isNull) {
-      return Err(
-        const FailureFoundation(
-          'No record found',
-          source: 'dao',
-        ),
-      );
-    }
+    if (record.isNull) return Err(noDataException<E>());
 
-    return toModel(record!);
+    return toModel<E>(record!);
   }
 
   /// Remove data from the db
@@ -265,5 +257,7 @@ abstract class CoreStore<T extends BaseModel> with ModelTransformation {
 
   String get resolveStoreName;
 
-  Result<T, FailureFoundation> toModel(Map<String, dynamic> record);
+  Result<T, E> toModel<E extends Exception>(Map<String, dynamic> record);
+
+  E noDataException<E extends Exception>();
 }

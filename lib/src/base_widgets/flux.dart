@@ -2,14 +2,14 @@
 
 //ignore_for_file: avoid_positional_boolean_parameters
 
+import 'package:corekit/corekit.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:foundation/foundation.dart';
 
-typedef OnFluxDialog<S extends StateFoundation> = void Function(S, bool);
+typedef OnFluxDialog<S extends BaseState> = void Function(S, bool);
 
 /// Wrap your page with Flux to handle your side effects
-class FluxCore<VM extends ViewModelFoundation<S>, S extends StateFoundation> extends StatelessWidget {
+class FluxCore<VM extends AutoDisposeNotifier<S>, S extends BaseState> extends StatelessWidget {
   const FluxCore({
     super.key,
     required this.provider,
@@ -22,7 +22,7 @@ class FluxCore<VM extends ViewModelFoundation<S>, S extends StateFoundation> ext
   final AutoDisposeNotifierProvider<VM, S> provider;
   final WidgetBuilder builder;
   final OnFluxDialog<S> onDialog;
-  final void Function(ViewModelFoundation<S>, S) onError;
+  final void Function(AutoDisposeNotifier<S>, S) onError;
   final WidgetRef ref;
 
   @override
@@ -40,7 +40,7 @@ class FluxCore<VM extends ViewModelFoundation<S>, S extends StateFoundation> ext
   }
 }
 
-class StickyFluxCore<VM extends StickyViewModelFoundation<S>, S extends StateFoundation> extends StatelessWidget {
+class StickyFluxCore<VM extends Notifier<S>, S extends BaseState> extends StatelessWidget {
   const StickyFluxCore({
     super.key,
     required this.provider,
@@ -53,7 +53,7 @@ class StickyFluxCore<VM extends StickyViewModelFoundation<S>, S extends StateFou
   final NotifierProvider<VM, S> provider;
   final WidgetBuilder builder;
   final OnFluxDialog<S> onDialog;
-  final void Function(StickyViewModelFoundation<S>, S) onError;
+  final void Function(Notifier<S>, S) onError;
   final WidgetRef ref;
 
   @override
@@ -71,7 +71,7 @@ class StickyFluxCore<VM extends StickyViewModelFoundation<S>, S extends StateFou
   }
 }
 
-void _onListen<S extends StateFoundation>({
+void _onListen<S extends BaseState>({
   required OnFluxDialog<S> onDialog,
   required void Function(S) onError,
   required S? oldState,
