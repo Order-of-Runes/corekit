@@ -1,6 +1,6 @@
 name: corekit
 description: "An opinionated core for a basic project based on riverpod"
-version: 0.0.22
+version: 0.0.23
 publish_to: none
 
 environment:
@@ -40,7 +40,7 @@ dependencies:
   utils:
     git:
       url: https://github.com/Order-of-Runes/utils.git
-      ref: main
+      ref: 0.0.4
 
 dev_dependencies:
   very_good_analysis: ^7.0.0

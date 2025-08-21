@@ -2,15 +2,14 @@
 
 import 'package:corekit/src/base/base_model.dart';
 import 'package:corekit/src/base/core_list_model.dart';
-import 'package:foundation/foundation.dart';
 import 'package:rusty_dart/rusty_dart.dart';
 
 mixin PaginationController {
   int _page = 1;
   int _totalPages = 1;
 
-  Result<List<T>, F> unwrapPaginated<T extends BaseModel, F extends FailureFoundation>(
-    Result<CoreListModel<T>, F> result,
+  Result<List<T>, E> unwrapPaginated<T extends BaseModel, E extends Exception>(
+    Result<CoreListModel<T>, E> result,
   ) {
     return result.match(
       ok: (value) {

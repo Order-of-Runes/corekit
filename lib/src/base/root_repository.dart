@@ -8,7 +8,6 @@ import 'package:corekit/src/base/core_list_model.dart';
 import 'package:corekit/src/base/core_remote.dart';
 import 'package:corekit/src/base/pagination_controller.dart';
 import 'package:flutter/foundation.dart';
-import 'package:foundation/foundation.dart';
 import 'package:rusty_dart/rusty_dart.dart';
 
 abstract class RootRepository<A extends ApiServiceCore, R extends CoreRemote<A>> {
@@ -17,16 +16,16 @@ abstract class RootRepository<A extends ApiServiceCore, R extends CoreRemote<A>>
   final R remote;
 
   @protected
-  Future<Result<T, F>> invoke<T, F extends FailureFoundation>({
-    required Future<Result<T, F>> Function() onRemote,
+  Future<Result<T, E>> invoke<T, E extends Exception>({
+    required Future<Result<T, E>> Function() onRemote,
   }) {
     return onRemote();
   }
 
   @protected
-  Future<Result<List<T>, F>> invokePaginated<T extends BaseModel, F extends FailureFoundation>({
+  Future<Result<List<T>, E>> invokePaginated<T extends BaseModel, E extends Exception>({
     required PaginationController controller,
-    required Future<Result<CoreListModel<T>, F>> Function(Map<String, int>) onRemote,
+    required Future<Result<CoreListModel<T>, E>> Function(Map<String, int>) onRemote,
   }) async {
     final unwrapped = controller.unwrapPaginated(await onRemote(controller.paginationParams));
     controller.bumpPage();
