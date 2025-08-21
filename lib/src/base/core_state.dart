@@ -4,7 +4,7 @@ import 'package:foundation/foundation.dart';
 
 abstract class CoreState extends StateFoundation {
   const CoreState({
-    this.failure,
+    this.exception,
     this.loading = Loading.inline,
     this.failureDisplay = FailureDisplay.inline,
     String? loadingTitle,
@@ -13,7 +13,7 @@ abstract class CoreState extends StateFoundation {
   }) : _loadingTitle = loadingTitle,
        _loadingSubtitle = loadingSubtitle;
 
-  final Exception? failure;
+  final Exception? exception;
   final Loading loading;
   final FailureDisplay failureDisplay;
   final String? _loadingTitle;
@@ -36,7 +36,7 @@ abstract class CoreState extends StateFoundation {
   });
 
   @override
-  bool get hasFailed => failure != null;
+  bool get hasFailed => exception != null;
 
   @override
   bool get isLoading => loading != Loading.none;
