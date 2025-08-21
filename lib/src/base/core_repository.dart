@@ -18,24 +18,25 @@ import 'package:utils/utils.dart';
 
 typedef RemoteTransformer<R, C> = C Function(R);
 
-abstract class CoreRepository<A extends ApiServiceCore, R extends CoreRemote<A>, D extends CoreDao> extends RootRepository<A, R> {
+abstract class CoreRepository<A extends ApiServiceCore, R extends CoreRemote<A>, D extends CoreDao, E extends Exception>
+    extends RootRepository<A, R> {
   const CoreRepository(super.remote, this.dao);
 
   final D dao;
 
-  CoreStore<CacheLifetimeModel> getCacheLTStore({bool eternal = false});
+  CoreStore<CacheLifetimeModel, E> getCacheLTStore({bool eternal = false});
 
-  E noNetworkException<E extends Exception>();
+  E get noNetworkException;
 
   @protected
-  Future<Result<T, E>> resolve<T, E extends Exception>({
+  Future<Result<T, E>> resolve<T>({
     required Future<Result<T, E>> Function() onRemote,
     FutureOr<void> Function(T)? onSave,
     FutureOr<Result<T, E>> Function()? onCache,
     bool preferCache = false,
     CacheLifetime? cacheLifetime,
   }) {
-    return resolveWithTransform<T, T, E>(
+    return resolveWithTransform<T, T>(
       onRemote: onRemote,
       onSave: onSave,
       onCache: onCache,
@@ -45,7 +46,7 @@ abstract class CoreRepository<A extends ApiServiceCore, R extends CoreRemote<A>,
   }
 
   @protected
-  Future<Result<C, E>> resolveWithTransform<T, C, E extends Exception>({
+  Future<Result<C, E>> resolveWithTransform<T, C>({
     required Future<Result<T, E>> Function() onRemote,
     FutureOr<void> Function(T)? onSave,
     FutureOr<Result<C, E>> Function()? onCache,
@@ -57,7 +58,7 @@ abstract class CoreRepository<A extends ApiServiceCore, R extends CoreRemote<A>,
     final _EagerCacheResult<T, C, E> eagerResult;
 
     if (preferCache) {
-      eagerResult = await _onEagerCache<T, C, E>(onRemote, onCache);
+      eagerResult = await _onEagerCache<T, C>(onRemote, onCache);
     } else {
       final cacheModel = cacheLifetime.isNull
           ? null
@@ -67,7 +68,7 @@ abstract class CoreRepository<A extends ApiServiceCore, R extends CoreRemote<A>,
       if (hasCacheExpired && isNetworkAvailable) {
         eagerResult = _EagerCacheResult.remote(await invoke(onRemote: onRemote));
       } else {
-        eagerResult = await _onEagerCache<T, C, E>(onRemote, onCache);
+        eagerResult = await _onEagerCache<T, C>(onRemote, onCache);
       }
     }
 
@@ -97,7 +98,7 @@ abstract class CoreRepository<A extends ApiServiceCore, R extends CoreRemote<A>,
   }
 
   @protected
-  Future<Result<List<T>, E>> resolvedPaginated<T extends BaseModel, E extends Exception>({
+  Future<Result<List<T>, E>> resolvedPaginated<T extends BaseModel>({
     required PaginationController controller,
     required Future<Result<CoreListModel<T>, E>> Function(Map<String, int> params) onRemote,
     FutureOr<void> Function(List<T>, {bool clear})? onSave,
@@ -105,7 +106,7 @@ abstract class CoreRepository<A extends ApiServiceCore, R extends CoreRemote<A>,
     bool preferCache = false,
     CacheLifetime? cacheLifetime,
   }) {
-    return resolve<List<T>, E>(
+    return resolve<List<T>>(
       onRemote: () async {
         final unwrapped = controller.unwrapPaginated<T, E>(await onRemote(controller.paginationParams));
         if (onSave.isNull) controller.bumpPage();
@@ -124,7 +125,7 @@ abstract class CoreRepository<A extends ApiServiceCore, R extends CoreRemote<A>,
   }
 
   @protected
-  Future<Result<List<C>, E>> resolvedPaginatedWithTransform<T extends BaseModel, C extends BaseModel, E extends Exception>({
+  Future<Result<List<C>, E>> resolvedPaginatedWithTransform<T extends BaseModel, C extends BaseModel>({
     required PaginationController controller,
     required Future<Result<CoreListModel<T>, E>> Function(Map<String, int> params) onRemote,
     FutureOr<void> Function(List<T>, {bool clear})? onSave,
@@ -133,7 +134,7 @@ abstract class CoreRepository<A extends ApiServiceCore, R extends CoreRemote<A>,
     CacheLifetime? cacheLifetime,
     RemoteTransformer<List<T>, List<C>>? transformer,
   }) {
-    return resolveWithTransform<List<T>, List<C>, E>(
+    return resolveWithTransform<List<T>, List<C>>(
       onRemote: () async {
         final unwrapped = controller.unwrapPaginated<T, E>(await onRemote(controller.paginationParams));
         if (onSave.isNull) controller.bumpPage();
@@ -156,7 +157,7 @@ abstract class CoreRepository<A extends ApiServiceCore, R extends CoreRemote<A>,
   bool get isNetworkAvailable;
 
   /// Tries with remote if cache does not have data
-  Future<_EagerCacheResult<T, C, E>> _onEagerCache<T, C, E extends Exception>(
+  Future<_EagerCacheResult<T, C, E>> _onEagerCache<T, C>(
     Future<Result<T, E>> Function() onRemote,
     FutureOr<Result<C, E>> Function()? onCache,
   ) async {
@@ -165,7 +166,7 @@ abstract class CoreRepository<A extends ApiServiceCore, R extends CoreRemote<A>,
 
     if (cache.isNull) {
       return _EagerCacheResult.remote(
-        isNetworkAvailable ? await invoke(onRemote: onRemote) : Err(noNetworkException<E>()),
+        isNetworkAvailable ? await invoke(onRemote: onRemote) : Err(noNetworkException),
       );
     }
 

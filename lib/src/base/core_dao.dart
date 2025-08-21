@@ -4,10 +4,10 @@ import 'package:corekit/src/base/base_model.dart';
 import 'package:corekit/src/store/store.dart';
 
 /// Base class for all cached data sources
-abstract class CoreDao {
+abstract class CoreDao<E extends Exception> {
   const CoreDao();
 
-  CoreStore<T> openStore<T extends BaseModel>({String? suffix, bool eternal = false});
+  CoreStore<T, E> openStore<T extends BaseModel>({String? suffix, bool eternal = false});
 
   Future<void> runBatch({bool eternal = false});
 }

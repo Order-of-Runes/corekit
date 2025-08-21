@@ -15,7 +15,7 @@ import 'package:utils/utils.dart';
 
 final Set<Future<void> Function(Transaction)> _ledger = {};
 
-abstract class CoreDatabase {
+abstract class CoreDatabase<E extends Exception> {
   CoreDatabase(
     String name, {
     this.enableLog = false,
@@ -80,7 +80,7 @@ abstract class CoreDatabase {
   ///
   /// Additionally you can also append a [suffix] to the name
   /// to avoid clashing
-  CoreStore<T> openStore<T extends BaseModel>({String? suffix});
+  CoreStore<T, E> openStore<T extends BaseModel>({String? suffix});
 
   /// Run all CRUD operations added in the batch
   Future<void> runBatch() async {
@@ -94,7 +94,7 @@ abstract class CoreDatabase {
   }
 }
 
-abstract class CoreStore<T extends BaseModel> with ModelTransformation {
+abstract class CoreStore<T extends BaseModel, E extends Exception> with ModelTransformation {
   CoreStore(
     Database db, {
     String? suffix,
@@ -130,7 +130,7 @@ abstract class CoreStore<T extends BaseModel> with ModelTransformation {
 
   /// Fetch data from the [CoreStore].
   /// via the usage of either [primaryKey] or [finder] to filter records.
-  Future<Result<List<T>, E>> fetch<E extends Exception>({String? primaryKey, Finder? finder}) async {
+  Future<Result<List<T>, E>> fetch({String? primaryKey, Finder? finder}) async {
     assert(primaryKey.isNull || finder.isNull, "Both 'primaryKey' and 'finder' can't be used at the same time.");
 
     if (primaryKey.isNotNull) {
@@ -138,14 +138,14 @@ abstract class CoreStore<T extends BaseModel> with ModelTransformation {
 
       if (record.isNull) return Ok([]);
 
-      return toModel<E>(record!).match(ok: (value) => Ok([value]), err: (e) => Err(e));
+      return toModel(record!).match(ok: (value) => Ok([value]), err: (e) => Err(e));
     }
     final records = await _ref.find(_db, finder: finder);
     final models = <T>[];
     E? failure;
 
     for (final record in records) {
-      final model = toModel<E>(record.value);
+      final model = toModel(record.value);
       if (model.isErr) {
         failure = model.err!;
         break;
@@ -187,7 +187,7 @@ abstract class CoreStore<T extends BaseModel> with ModelTransformation {
   ///            ],
   /// }
   /// ```
-  Future<Result<Map<String, List<T>>, E>> fetchAndGroup<E extends Exception>({
+  Future<Result<Map<String, List<T>>, E>> fetchAndGroup({
     required String groupBy,
     Finder? finder,
   }) async {
@@ -203,7 +203,7 @@ abstract class CoreStore<T extends BaseModel> with ModelTransformation {
   /// Fetches the first data from the [CoreStore].
   ///
   /// Either use [primaryKey] or [finder] to filter records.
-  Future<Result<T, E>> fetchFirst<E extends Exception>({String? primaryKey, Finder? finder}) async {
+  Future<Result<T, E>> fetchFirst({String? primaryKey, Finder? finder}) async {
     assert(
       primaryKey.isNull || finder.isNull,
       "Both 'primaryKey' and 'finder' can't be used at the same time.",
@@ -217,9 +217,9 @@ abstract class CoreStore<T extends BaseModel> with ModelTransformation {
       record = await _ref.record(primaryKey!).get(_db);
     }
 
-    if (record.isNull) return Err(noDataException<E>());
+    if (record.isNull) return Err(noDataException);
 
-    return toModel<E>(record!);
+    return toModel(record!);
   }
 
   /// Remove data from the db
@@ -257,7 +257,7 @@ abstract class CoreStore<T extends BaseModel> with ModelTransformation {
 
   String get resolveStoreName;
 
-  Result<T, E> toModel<E extends Exception>(Map<String, dynamic> record);
+  Result<T, E> toModel(Map<String, dynamic> record);
 
-  E noDataException<E extends Exception>();
+  E get noDataException;
 }
