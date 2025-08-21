@@ -17,6 +17,7 @@ export 'src/base/root_repository.dart';
 export 'src/base_widgets/flux.dart';
 export 'src/debug_info/debug_info.dart';
 export 'src/debug_info/network_log_page.dart';
+export 'src/exception/corekit_exception.dart';
 export 'src/foundation/api_url_foundation.dart';
 export 'src/foundation/routes_foundation.dart';
 export 'src/foundation/url_prefix_foundation.dart';
