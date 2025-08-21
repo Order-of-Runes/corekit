@@ -4,14 +4,14 @@ import 'package:flutter/material.dart';
 import 'package:rusty_dart/rusty_dart.dart';
 
 /// Requests the permission.
-Future<void> requestPermissionCore({
+Future<void> requestPermissionCore<E extends Exception>({
   required BuildContext context,
-  required Future<Result<bool, E>> Function<E extends Exception>() onPermission,
+  required Future<Result<bool, E>> Function() onPermission,
   required VoidCallback onGranted,
   required String title,
   required String description,
   VoidCallback? onDenied,
-  void Function<E extends Exception>(E exception)? onError,
+  ValueChanged<E>? onError,
 }) async {
   final permissionResult = await onPermission();
 
