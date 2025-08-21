@@ -19,7 +19,7 @@ import 'package:utils/utils.dart';
 typedef RemoteTransformer<R, C> = C Function(R);
 
 abstract class CoreRepository<A extends ApiServiceCore, R extends CoreRemote<A>, D extends CoreDao, E extends Exception>
-    extends RootRepository<A, R> {
+    extends RootRepository<A, R, E> {
   const CoreRepository(super.remote, this.dao);
 
   final D dao;

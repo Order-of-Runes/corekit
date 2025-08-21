@@ -9,7 +9,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:rusty_dart/rusty_dart.dart';
 import 'package:utils/utils.dart';
 
-abstract class CoreViewModel<S extends CoreState> extends AutoDisposeNotifier<S> {
+abstract class CoreViewModel<S extends CoreState<E>, E extends Exception> extends AutoDisposeNotifier<S> {
   CoreViewModel({this.enableLog = false}) : logcat = Logcat();
 
   final Logcat logcat;
@@ -34,7 +34,7 @@ abstract class CoreViewModel<S extends CoreState> extends AutoDisposeNotifier<S>
   /// If [suppress] is provided [Failure] will not be raised,
   /// [onError] will not be triggered
   @protected
-  Future<void> runGuarded<E extends Exception>(
+  Future<void> runGuarded(
     FutureOr<void> Function() block, {
     void Function(E)? onError,
     bool suppress = false,
@@ -57,7 +57,7 @@ abstract class CoreViewModel<S extends CoreState> extends AutoDisposeNotifier<S>
 
   /// Emits a [Failure] state based on the condition
   @protected
-  bool raise<E extends Exception>(
+  bool raise(
     E Function() failureBuilder,
     bool Function() block,
   ) {
@@ -72,7 +72,7 @@ abstract class CoreViewModel<S extends CoreState> extends AutoDisposeNotifier<S>
   ///
   /// This is the asynchronous version of [raise]
   @protected
-  Future<bool> raiseAsync<E extends Exception>(
+  Future<bool> raiseAsync(
     E Function() failureBuilder,
     Future<bool> Function() block,
   ) async {
@@ -87,7 +87,7 @@ abstract class CoreViewModel<S extends CoreState> extends AutoDisposeNotifier<S>
   ///
   /// Returns true if failure is successfully raised
   @protected
-  bool raiseIfError<E extends Exception>(
+  bool raiseIfError(
     Result<dynamic, E> result,
   ) {
     return result.match(
@@ -103,7 +103,7 @@ abstract class CoreViewModel<S extends CoreState> extends AutoDisposeNotifier<S>
   ///
   /// Returns true if failure is successfully raised
   @protected
-  bool raiseIfErrors<E extends Exception>(
+  bool raiseIfErrors(
     List<Result<dynamic, E>> results,
     E Function(List<E>) onFailure, {
     E? Function(List<E>)? onCustomHandling,
@@ -158,7 +158,7 @@ abstract class CoreViewModel<S extends CoreState> extends AutoDisposeNotifier<S>
     ref.onDispose(cb);
   }
 
-  void _raise(Exception failure) {
+  void _raise(E failure) {
     emit(state.setFailure(failure) as S);
   }
 }
