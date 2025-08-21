@@ -106,6 +106,7 @@ abstract class CoreViewModel<S extends BaseState> extends AutoDisposeNotifier<S>
   bool raiseIfErrors<E extends Exception>(
     List<Result<dynamic, E>> results,
     E Function(List<E>) onFailure,
+    bool Function(List<E>)? onCustomHandling,
   ) {
     final List<E> failures = [];
 
@@ -116,6 +117,10 @@ abstract class CoreViewModel<S extends BaseState> extends AutoDisposeNotifier<S>
     }
 
     if (failures.isEmpty) return false;
+
+    if (onCustomHandling.isNotNull) {
+      return onCustomHandling!(failures);
+    }
 
     if (failures.length == 1) {
       _raise(failures.first);
