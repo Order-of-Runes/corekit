@@ -1,6 +1,7 @@
 // Copyright (c) 2024 Order of Runes Authors. All rights reserved.
 
 import 'dart:async';
+import 'dart:nativewrappers/_internal/vm/lib/ffi_allocation_patch.dart';
 
 import 'package:corekit/src/base/base_state.dart';
 import 'package:corekit/src/logcat/logcat.dart';
@@ -106,7 +107,7 @@ abstract class CoreViewModel<S extends BaseState> extends AutoDisposeNotifier<S>
   bool raiseIfErrors<E extends Exception>(
     List<Result<dynamic, E>> results,
     E Function(List<E>) onFailure, {
-    bool Function(List<E>)? onCustomHandling,
+    E? Function(List<E>)? onCustomHandling,
   }) {
     final List<E> failures = [];
 
@@ -119,7 +120,11 @@ abstract class CoreViewModel<S extends BaseState> extends AutoDisposeNotifier<S>
     if (failures.isEmpty) return false;
 
     if (onCustomHandling.isNotNull) {
-      return onCustomHandling!(failures);
+      final customFailure = onCustomHandling?.call(failures);
+      if (customFailure.isNotNull) {
+        _raise(customFailure!);
+        return true;
+      }
     }
 
     if (failures.length == 1) {
