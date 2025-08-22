@@ -11,11 +11,11 @@ dependencies:
   basic_components:
     git:
       url: https://github.com/Order-of-Runes/basic_components.git
-      ref: 0.0.6
+      ref: 0.0.8
   better_components:
     git:
       url: https://github.com/Order-of-Runes/better_components.git
-      ref: 0.0.3
+      ref: 0.0.4
   dio: ^5.9.0
   equatable: ^2.0.7
   flutter:
@@ -40,7 +40,7 @@ dependencies:
   utils:
     git:
       url: https://github.com/Order-of-Runes/utils.git
-      ref: 0.0.5
+      ref: 0.0.6
 
 dev_dependencies:
   very_good_analysis: ^7.0.0
