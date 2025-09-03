@@ -1,6 +1,6 @@
 name: corekit
 description: "An opinionated core for a basic project based on riverpod"
-version: 0.0.35
+version: 0.0.36
 publish_to: none
 
 environment:

@@ -120,10 +120,10 @@ abstract class CoreStore<T extends BaseModel, E extends Exception> with ModelTra
   /// by enabling [inBatch]
   Future<void> insert(List<T> models, {bool clear = false, bool merge = true, bool inBatch = false}) async {
     if (inBatch) {
-      _ledger.add((txn) => _insert(models, transaction: txn, merge: merge));
+      _ledger.add((txn) => _insert(models, transaction: txn, merge: merge, clear: clear));
     } else {
       await _db.transaction((txn) async {
-        await _insert(models, transaction: txn);
+        await _insert(models, transaction: txn, clear: clear, merge: merge);
       });
     }
   }
