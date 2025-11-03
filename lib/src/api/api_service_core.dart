@@ -14,6 +14,7 @@ abstract class ApiServiceCore {
   ApiServiceCore({
     required String baseUrl,
     List<Interceptor>? interceptors,
+    Dio? dio,
   }) {
     const timeout = Duration(minutes: 1);
     const receiveTimeout = Duration(minutes: 5);
@@ -23,7 +24,7 @@ abstract class ApiServiceCore {
       connectTimeout: receiveTimeout,
       validateStatus: (status) => status != null && status >= 200 && status < 300,
     );
-    _dio = Dio();
+    _dio = dio ?? Dio();
 
     if (interceptors.isNotNullAndNotEmpty) {
       _dio.interceptors.addAll(interceptors!);
