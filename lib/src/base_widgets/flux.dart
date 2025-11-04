@@ -9,24 +9,22 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 typedef OnFluxDialog<S extends CoreState> = void Function(S, bool);
 
 /// Wrap your page with Flux to handle your side effects
-class FluxCore<VM extends AutoDisposeNotifier<S>, S extends CoreState> extends StatelessWidget {
+class FluxCore<VM extends AutoDisposeNotifier<S>, S extends CoreState> extends ConsumerWidget {
   const FluxCore({
     super.key,
     required this.provider,
     required this.builder,
     required this.onDialog,
     required this.onError,
-    required this.ref,
   });
 
   final AutoDisposeNotifierProvider<VM, S> provider;
   final WidgetBuilder builder;
   final OnFluxDialog<S> onDialog;
   final void Function(AutoDisposeNotifier<S>, S) onError;
-  final WidgetRef ref;
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     ref.listen(provider, (o, n) {
       _onListen(
         onDialog: onDialog,
@@ -40,24 +38,22 @@ class FluxCore<VM extends AutoDisposeNotifier<S>, S extends CoreState> extends S
   }
 }
 
-class StickyFluxCore<VM extends Notifier<S>, S extends CoreState> extends StatelessWidget {
+class StickyFluxCore<VM extends Notifier<S>, S extends CoreState> extends ConsumerWidget {
   const StickyFluxCore({
     super.key,
     required this.provider,
     required this.builder,
     required this.onDialog,
     required this.onError,
-    required this.ref,
   });
 
   final NotifierProvider<VM, S> provider;
   final WidgetBuilder builder;
   final OnFluxDialog<S> onDialog;
   final void Function(Notifier<S>, S) onError;
-  final WidgetRef ref;
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     ref.listen(provider, (o, n) {
       _onListen(
         onDialog: onDialog,
