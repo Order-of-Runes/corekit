@@ -137,7 +137,11 @@ abstract class ApiServiceCore {
           );
         }
 
-        if (data is Map<String, dynamic> && onError.isNotNull) return onError!(data);
+        if (data is Map<String, dynamic> && onError.isNotNull) {
+          final errorMap = {...data};
+          errorMap['status_code'] = statusCode;
+          return onError!(errorMap);
+        }
 
         return const CorekitException(_genericErrorMessage);
 
